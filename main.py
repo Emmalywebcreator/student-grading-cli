@@ -14,10 +14,15 @@ def get_score(subject_name):
                 print("Invalid input: Score must be between 0 and 100")
                 continue
             return score
-            break
         except ValueError:
             print("Error: Enter a valid number")
             continue
+
+def has_passed(m_score, e_score, c_score):
+    if m_score >=  pass_mark and e_score >= pass_mark and c_score >= pass_mark:
+        return True
+    return False
+        
 
 def main():
     student_name = input("Enter your name: ")
@@ -30,10 +35,10 @@ def main():
     avg_score = total_score / 3
 
 # TODO4: Determines whether they passed, assuming a score of 50 or above in each subject is a pass.
-    if maths_score >=  pass_mark and eng_score >= pass_mark and csc_score >= pass_mark:
+    if has_passed(maths_score, eng_score, csc_score):
         overall_res = f"Congratulation! You passed successfully."
-    else:
-        overall_res = f"Sorry you fail, didn't meet the requirement."
+    overall_res = f"Sorry you fail, didn't meet the requirement."
+
 # TODO5: Prints the student's name, total, average, and overall result.
     print("<----- Here is the Summary of your Result ---->")
     print(f"{student_name}")
