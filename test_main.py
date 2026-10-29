@@ -2,7 +2,37 @@
 
 import unittest
 from unittest.mock import patch
-from main import get_score
+from main import get_score, main
+from io import StringIO
+
+class TestMainResult(unittest.TestCase):
+
+    def test_passing_student_sees_pass_message(self):
+        inputs = ["Talia", "87", "90", "89"]
+
+        with (
+            patch("builtins.input", side_effect=inputs),
+            patch("sys.stdout", new_callable=StringIO) as output,
+        ):
+            main()
+
+        self.assertIn(
+            "Overall Result: Congratulation! You passed successfully.",
+            output.getvalue()
+        )
+
+    def test_failing_student_sees_fail_message(self):
+        inputs = ["John", "90", "67", "45"]
+
+        with(
+            patch("builtins.input", side_effect=inputs),
+            patch("sys.stdout", new_callable=StringIO) as output,
+        ):
+            main()
+        self.assertIn(
+            "Overall Result: Sorry you fail, didn't meet the requirement.",
+            output.getvalue(),
+        )
 
 
 class TestGetScore(unittest.TestCase):
