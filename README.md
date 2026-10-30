@@ -19,3 +19,10 @@ scores in Mathematics, English, and Computer Science.
 
 ```bash
 python3 main.py
+```
+
+## Run the tests
+
+```bash
+python3 -m unittest -v
+```
