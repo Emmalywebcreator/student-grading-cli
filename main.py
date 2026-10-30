@@ -1,12 +1,13 @@
 #!/usr/bin/python3
 
-#  A Python program that does takes a student name, colloct his/her scores in three subject - Mathematics, English, and Computer Science. Calculate their scores and tell them if they pass or fail.
+"""
+A Python program that does takes a student name, colloct his/her scores in three subject - Mathematics, English, and Computer Science. Calculate their scores and tell them if they pass or fail.
+"""
 
-pass_mark = 50
+PASS_MARK = 50
 
 
-# TODO2: Collect their scores in Mathematics, English, and Computer Science.
-def get_score(subject_name):
+def get_score(subject_name: str) -> int:
     while True:
         try:
             score = int(input(f"Enter {subject_name} Score: "))
@@ -16,30 +17,34 @@ def get_score(subject_name):
             return score
         except ValueError:
             print("Error: Enter a valid number")
-            continue
 
-def has_passed(m_score, e_score, c_score):
-    if m_score >=  pass_mark and e_score >= pass_mark and c_score >= pass_mark:
-        return True
-    return False
-        
+
+def has_passed(m_score: int, e_score: int, c_score: int) -> bool:
+    return all(score >= PASS_MARK for score in (m_score, e_score, c_score))
+
+
+def get_name() -> str:
+    while True:
+        name = input("Enter your name: ").strip()
+        if name:
+            return name
+        print("Error: Name cannot be empty")
+
 
 def main():
-    student_name = input("Enter your name: ")
+    student_name = get_name()
     maths_score = get_score("Mathematics")
     eng_score = get_score("English")
     csc_score = get_score("Computer Science")
 
-
     total_score = maths_score + eng_score + csc_score
     avg_score = total_score / 3
 
-# TODO4: Determines whether they passed, assuming a score of 50 or above in each subject is a pass.
     if has_passed(maths_score, eng_score, csc_score):
-        overall_res = f"Congratulation! You passed successfully."
-    overall_res = f"Sorry you fail, didn't meet the requirement."
+        overall_res = "Congratulations! You passed successfully."
+    else:
+        overall_res = "Sorry you fail, didn't meet the requirement."
 
-# TODO5: Prints the student's name, total, average, and overall result.
     print("<----- Here is the Summary of your Result ---->")
     print(f"{student_name}")
     print(f"- Total Score: {total_score}")
@@ -47,5 +52,5 @@ def main():
     print(f"- Overall Result: {overall_res}")
 
 
-if __name__=="__main__":
+if __name__ == "__main__":
     main()
