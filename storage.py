@@ -1,14 +1,22 @@
 import json
 from pathlib import Path
 
-def load_results(path: str | Path =  "results.json") -> list[dict]:
-    '''Return the results, or an empty list if there is no file'''
+
+class CorruptResultsError(Exception):
+    "Raised when the results file exists but is not valid JSON."
+
+
+def load_results(path: str | Path = "results.json") -> list[dict]:
+    """Return the results, or an empty list if there is no file"""
     try:
         with open(path, "r", encoding="utf-8") as f:
             return json.load(f)
 
     except FileNotFoundError:
         return []
+    except json.JSONDecodeError as error:
+        raise CorruptResultsError(f"{path} is corrupted; fix or delete it") from error
+
 
 def save_result(name: str, total: int, path: str | Path = "results.json") -> None:
     """Append one student's result to the json file"""
@@ -27,4 +35,3 @@ if __name__ == "__main__":
     save_result("John", 180, "scratch.json")
     save_result("Mathew", 250, "results.json")
     print(load_results("scratch.json"))
-
