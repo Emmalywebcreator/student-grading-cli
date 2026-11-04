@@ -8,7 +8,7 @@
 
 ## How we work through each stage
 
-1. **Concept:** I(Claude AI) explain the idea briefly, with a small example.
+1. **Concept:** I explain the idea briefly, with a small example.
 2. **Explore:** You work it out yourself (docs, experiments, your own code). Attempt before asking AI to solve it.
 3. **Outcome:** You paste your code, terminal output, or notes.
 4. **Review:** I check correctness, style and tests, and tell you what to fix.
@@ -22,7 +22,7 @@ Every stage ends with a **checkpoint**: you can explain it and do it without cop
 
 | Phase | Days | Focus | Status |
 | --- | --- | --- | --- |
-| 1 | 1-5 | Refresh Python | `[~]` |
+| 1 | 1-5 | Refresh Python | `[~]` (Days 1, 3, 5 done; Day 2 and Day 4 polish left) |
 | 2 | 6-9 | Maintainable Python | `[ ]` |
 | 3 | 10-15 | Databases and APIs | `[ ]` |
 | 4 | 16-20 | Project 1: Task Management API | `[ ]` |
@@ -41,11 +41,11 @@ Every stage ends with a **checkpoint**: you can explain it and do it without cop
 | 2 | Lists, tuples, sets, dictionaries | Student records manager | `[ ]` |
 | 3 | Conditions, loops, comprehensions | Student grading system | `[x]` (covered in Day 1 work) |
 | 4 | Functions, arguments, scope, type hints | Refactor grading into reusable functions | `[~]` (functions and hints done; extend with persistence) |
-| 5 | Exceptions, files, modules, imports | Save and retrieve student records from a file (JSON) | `[~]` next up |
+| 5 | Exceptions, files, modules, imports | Save and retrieve student records from a file (JSON) | `[x]` |
 
 ### Outcome log
 
-**Day 1-4: Diagnostic (student-grading-cli)** · Repo: `github.com/Emmalywebcreator/student-grading-cli`
+**Day 1: Diagnostic (student-grading-cli)** · Repo: `github.com/Emmalywebcreator/student-grading-cli`
 - Built: CLI that collects a name and three scores, validates them, computes total/average, decides pass/fail (50+ in every subject).
 - Bugs found and fixed: missing `else` (every student failed); missing `continue` after range check (invalid score accepted).
 - Added: `get_name()` with `.strip()` and re-prompt; `has_passed` via `all()`; `PASS_MARK` constant; type hints.
@@ -54,10 +54,14 @@ Every stage ends with a **checkpoint**: you can explain it and do it without cop
 - Git: feature branch, 4 focused commits, PR merged into `main`.
 - Lessons: a failing test is doing its job; read the actual output before changing code; `continue` after an error message is what forces re-entry.
 
-**Day 5: File handling and JSON (feature/save-results)** · *In progress*
-- Task: `storage.py` with `load_results(path="results.json") -> list[dict]` (returns `[]` if missing), then `save_result(...)`, then handle corrupt JSON.
-- Tests use `tempfile.TemporaryDirectory()`; add `results.json` to `.gitignore`.
-- Outcome: _(paste here)_
+**Day 5: File handling and JSON (feature/save-results)** · *Done*
+- Built `storage.py`: `load_results(path)` returns `[]` when the file is missing; `save_result(name, total, path)` loads the list, appends one record, and writes the whole list back with mode `"w"`.
+- Added `CorruptResultsError`: invalid JSON in the file is reported clearly instead of crashing with a raw `JSONDecodeError`, and `save_result` refuses to overwrite a corrupt file.
+- Tests (22 in total, all passing): missing file, valid file, save into a missing file, save twice keeps the first record, saving does not overwrite a corrupt file. All use `tempfile.TemporaryDirectory()` so real data is never touched. Tests now live in `tests/` and run with `python3 -m unittest discover -s tests -v` from the project root.
+- Thinking question: chose try-and-catch over check-first because the file can change between the check and the open (race condition), and it needs less code. Catch only the specific error you can handle (`FileNotFoundError`); let everything else fail loudly.
+- Proof the tests protect the code: with `"a"` instead of `"w"`, the "save twice" test failed with `JSONDecodeError: Extra data`, while the single-save test still passed.
+- Lessons: `open("path")` (quotes) opens a file literally named path, and `except FileNotFoundError: return []` hid that bug until a test checked real data; a `SyntaxError` in a test file makes the whole file vanish from the test count; `[...][...]` is indexing, not a list of two items; `json.dumps` (to string) vs `json.dump` (to file); run commands from the project root.
+- Still to do: add a direct `load_results` test for the corrupt file (`assertRaises(CorruptResultsError)`), run `ruff check --fix . && ruff format . && ruff check .`, and commit and open the PR.
 
 ---
 
@@ -67,12 +71,22 @@ Every stage ends with a **checkpoint**: you can explain it and do it without cop
 
 | Day | Topic | Practical exercise | Status |
 | --- | --- | --- | --- |
-| 6 | Classes, objects, inheritance, encapsulation | Model students, teachers, courses | `[ ]` |
+| 6 | Classes, objects, inheritance, encapsulation | Model students, teachers, courses | `[~]` (Student class done; teachers, courses, inheritance next) |
 | 7 | Iteration, generators, decorators, built-ins | Practical data-processing problems | `[ ]` |
 | 8 | Virtual environments, packages, debugging | Set up a clean Python project | `[ ]` (`.venv` already in use) |
 | 9 | Git, GitHub, clean code, refactoring | Organise and version-control your project | `[ ]` (PR workflow already practised) |
 
-**Outcome log:** _(empty)_
+### Outcome log
+
+**Day 6: Classes and pytest (feature/student-class)** · *Student class done, teachers/courses/inheritance still to do*
+- Switched to **pytest** for new tests (`pytest.ini` with `pythonpath = .` and `testpaths = tests`). Old `unittest` tests run unchanged under it.
+- Built `models.py` test-first, one method per loop (red, then green): `Student(name, scores)` with `total()`, `average()`, `has_passed(pass_mark=50)` and `to_dict()`.
+- Concepts: `__init__` and `self`, attributes vs methods, default parameters, `all(score >= pass_mark for score in self.scores.values())`, `pytest.approx` for floats, `@pytest.fixture` replacing `setUp`, `@pytest.mark.parametrize` for the 50 / 49 / high-average-one-fail boundary rows, `pytest.raises`.
+- Edge case decisions: `average()` on empty scores raises `ValueError` (no scores means no average; returning `0.0` would hide the problem); `has_passed()` is `False` for empty scores, because `all()` of an empty collection is `True`.
+- Mutation checks: changing `>=` to `>` failed the exactly-50 row; wrong dict key and bracket mistakes were caught immediately.
+- Final state: 30 tests passing.
+- Lessons: bracket type is meaning (`()` call, `[]` list/index, `{}` dict/set); `assert obj.method` without `()` can never fail and `obj.method` without `()` raises nothing; pytest shows `<Student object ...>.method` when you accidentally pass a bound method instead of its result; a test is only trustworthy after you have watched it fail for the right reason; read the `>` line and `E` lines first in a failure.
+- Still to do: run ruff, commit and open the PR; wire `Student.to_dict()` into the CLI and `save_result`.
 
 ---
 
@@ -144,12 +158,12 @@ Take one project and add: Docker · GitHub Actions · automated testing · envir
 
 ## Must-know areas checklist (from the roadmap)
 
-- [~] 1. Python fundamentals
+- [~] 1. Python fundamentals (files, JSON, exceptions covered)
 - [~] 2. Git and GitHub (branches, PRs, `.gitignore` done; merge conflicts, stash still to practise)
 - [ ] 3. SQL and database fundamentals
 - [ ] 4. APIs and HTTP
 - [ ] 5. One backend framework (Flask)
-- [~] 6. Testing and debugging (unittest, mocking, boundaries done; pytest still to learn)
+- [~] 6. Testing and debugging (unittest and pytest, mocking, boundaries, temp files, fixtures, parametrize, red-then-green, mutation checks)
 - [~] 7. Clean code principles (ruff, type hints, naming)
 - [ ] 8. Linux, terminal, environment management (venv in use)
 - [ ] 9. Docker and deployment basics
@@ -161,5 +175,9 @@ Take one project and add: Docker · GitHub Actions · automated testing · envir
 | --- | --- | --- |
 | `continue` vs fall-through in loops | Removed a needed `continue`; invalid score accepted | Day 6 |
 | Tracking generated files in Git | `__pycache__` was committed | Fixed |
+| Forgetting `()` when calling a method (twice in Day 6) | Tests passed or failed for the wrong reason (`assert obj.method`, `.average` in `pytest.raises`) | Check every `assert` with `grep -n assert tests/*.py` |
+| Typos in names and strings (`"path"` vs `path`, `encodinging`, `fisrt`) | Caused silent wrong behaviour and test errors | Run `ruff check .` after every edit |
+| Writing a list of dicts in Python | `[...][...]` and merged dicts | Day 6 |
+| Shell commands | `ruff check . and ruff format .`; running tests from inside `tests/` | Day 8 |
 
 _Honest note: thirty days is an intensive preparation target, not a guarantee of employment readiness. If a concept needs more practice, we repeat it instead of abandoning the plan._
