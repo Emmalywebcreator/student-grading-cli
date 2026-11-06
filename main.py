@@ -9,7 +9,6 @@ from models import Student
 from storage import save_result
 
 
-
 def get_score(subject_name: str) -> int:
     while True:
         try:
