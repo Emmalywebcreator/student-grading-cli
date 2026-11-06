@@ -71,22 +71,26 @@ Every stage ends with a **checkpoint**: you can explain it and do it without cop
 
 | Day | Topic | Practical exercise | Status |
 | --- | --- | --- | --- |
-| 6 | Classes, objects, inheritance, encapsulation | Model students, teachers, courses | `[~]` (Student class done; teachers, courses, inheritance next) |
+| 6 | Classes, objects, inheritance, encapsulation | Model students, teachers, courses | `[~]` (Student class done and wired into the CLI; teachers, courses, inheritance next) |
 | 7 | Iteration, generators, decorators, built-ins | Practical data-processing problems | `[ ]` |
 | 8 | Virtual environments, packages, debugging | Set up a clean Python project | `[ ]` (`.venv` already in use) |
 | 9 | Git, GitHub, clean code, refactoring | Organise and version-control your project | `[ ]` (PR workflow already practised) |
 
 ### Outcome log
 
-**Day 6: Classes and pytest (feature/student-class)** · *Student class done, teachers/courses/inheritance still to do*
+**Day 6: Classes and pytest (feature/student-class)** · *Student class built and wired into the CLI; teachers/courses/inheritance still to do*
 - Switched to **pytest** for new tests (`pytest.ini` with `pythonpath = .` and `testpaths = tests`). Old `unittest` tests run unchanged under it.
 - Built `models.py` test-first, one method per loop (red, then green): `Student(name, scores)` with `total()`, `average()`, `has_passed(pass_mark=50)` and `to_dict()`.
 - Concepts: `__init__` and `self`, attributes vs methods, default parameters, `all(score >= pass_mark for score in self.scores.values())`, `pytest.approx` for floats, `@pytest.fixture` replacing `setUp`, `@pytest.mark.parametrize` for the 50 / 49 / high-average-one-fail boundary rows, `pytest.raises`.
 - Edge case decisions: `average()` on empty scores raises `ValueError` (no scores means no average; returning `0.0` would hide the problem); `has_passed()` is `False` for empty scores, because `all()` of an empty collection is `True`.
 - Mutation checks: changing `>=` to `>` failed the exactly-50 row; wrong dict key and bracket mistakes were caught immediately.
-- Final state: 30 tests passing.
+- Wiring (feature/wire-student): refactored `main()` to build a `Student` and use `total()`, `average()` and `has_passed()` (a refactor is verified by unchanged tests); moved the pass mark into `models.py`; retired the old standalone `has_passed` and folded its cases into the parametrized rows; connected `save_result(**student.to_dict())` (`**` unpacks a dict into keyword arguments).
+- Protecting real data: tests that called `main()` wrote to the real `results.json` and hit `CorruptResultsError` on an empty file. Fixed with `tests/conftest.py`: an `autouse` fixture using `monkeypatch.setattr("main.save_result", ...)` (patch the name where it is used). Added `tests/test_cli_save.py`, which records the call and asserts `[{"name": "Talia", "total": 266}]`; mutation check (call commented out) failed with `assert [] == [...]`, then restored.
+- Final state: 28 tests passing, real `results.json` untouched by the test run.
 - Lessons: bracket type is meaning (`()` call, `[]` list/index, `{}` dict/set); `assert obj.method` without `()` can never fail and `obj.method` without `()` raises nothing; pytest shows `<Student object ...>.method` when you accidentally pass a bound method instead of its result; a test is only trustworthy after you have watched it fail for the right reason; read the `>` line and `E` lines first in a failure.
-- Still to do: run ruff, commit and open the PR; wire `Student.to_dict()` into the CLI and `save_result`.
+- More lessons: code at the top level of a module runs on import (a `NameError` there broke every test file that imported `main`); a collection error or a sudden drop in the test count means a file failed to import; when code moves, its tests move with it; unused imports get removed by `ruff --fix`, which can break a fixture that patches them.
+- Open question to decide: is a 0-byte `results.json` corrupt, or just "no results yet"?
+- Still to do: ruff pass, commit in pieces, open the PR for feature/wire-student.
 
 ---
 
@@ -176,6 +180,7 @@ Take one project and add: Docker · GitHub Actions · automated testing · envir
 | `continue` vs fall-through in loops | Removed a needed `continue`; invalid score accepted | Day 6 |
 | Tracking generated files in Git | `__pycache__` was committed | Fixed |
 | Forgetting `()` when calling a method (twice in Day 6) | Tests passed or failed for the wrong reason (`assert obj.method`, `.average` in `pytest.raises`) | Check every `assert` with `grep -n assert tests/*.py` |
+| Top-level code in a module that needs runtime values (`student_name`) | `NameError` on import broke test collection | Keep only `def`, `class`, imports and constants at module level |
 | Typos in names and strings (`"path"` vs `path`, `encodinging`, `fisrt`) | Caused silent wrong behaviour and test errors | Run `ruff check .` after every edit |
 | Writing a list of dicts in Python | `[...][...]` and merged dicts | Day 6 |
 | Shell commands | `ruff check . and ruff format .`; running tests from inside `tests/` | Day 8 |
