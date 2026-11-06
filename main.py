@@ -1,10 +1,13 @@
 #!/usr/bin/python3
 
 """
-A Python program that does takes a student name, colloct his/her scores in three subject - Mathematics, English, and Computer Science. Calculate their scores and tell them if they pass or fail.
+A Python program that does takes a student name, collect his/her scores in three subject - Mathematics,
+English, and Computer Science. Calculate their scores and tell them if they pass or fail.
 """
 
-PASS_MARK = 50
+from models import Student
+from storage import save_result
+
 
 
 def get_score(subject_name: str) -> int:
@@ -17,10 +20,6 @@ def get_score(subject_name: str) -> int:
             return score
         except ValueError:
             print("Error: Enter a valid number")
-
-
-def has_passed(m_score: int, e_score: int, c_score: int) -> bool:
-    return all(score >= PASS_MARK for score in (m_score, e_score, c_score))
 
 
 def get_name() -> str:
@@ -37,19 +36,24 @@ def main():
     eng_score = get_score("English")
     csc_score = get_score("Computer Science")
 
-    total_score = maths_score + eng_score + csc_score
-    avg_score = total_score / 3
 
-    if has_passed(maths_score, eng_score, csc_score):
+    student = Student(student_name, {
+    "Mathematics": maths_score,
+    "English": eng_score,
+    "Computer Science": csc_score
+})
+
+    if student.has_passed():
         overall_res = "Congratulations! You passed successfully."
     else:
         overall_res = "Sorry you fail, didn't meet the requirement."
 
     print("<----- Here is the Summary of your Result ---->")
     print(f"{student_name}")
-    print(f"- Total Score: {total_score}")
-    print(f"- Average Score: {avg_score:.2f}")
+    print(f"- Total Score: {student.total()}")
+    print(f"- Average Score: {student.average():.2f}")
     print(f"- Overall Result: {overall_res}")
+    save_result(**student.to_dict())
 
 
 if __name__ == "__main__":

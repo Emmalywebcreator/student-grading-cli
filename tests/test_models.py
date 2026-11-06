@@ -19,6 +19,8 @@ def test_average(student):
 @pytest.mark.parametrize(
     ("scores", "expected"),
     [
+        ({"Maths": 90, "English": 69, "CSC": 70}, True),    # all comfortably above
+        ({"Maths": 40, "English": 34, "CSC": 45}, False),   # all below
         ({"Maths": 50, "English": 50, "CSC": 50}, True),
         ({"Maths": 49, "English": 50, "CSC": 50}, False),
         ({"Maths": 94, "English": 92, "CSC": 45}, False),
