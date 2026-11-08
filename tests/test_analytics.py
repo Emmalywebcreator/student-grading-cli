@@ -1,6 +1,6 @@
 import pytest
 
-from analytics import top_scorer
+from analytics import class_average, top_scorer
 
 RECORDS = [
     {"name": "Talia", "total": 266},
@@ -32,6 +32,10 @@ def test_top_scorer_with_tie():
 
 
 def test_top_scorer_of_empty_list():
-    # assert top_scorer([]) is None
-    with pytest.raises(ValueError):
-        top_scorer([])
+    assert top_scorer([]) is None
+
+def test_average():
+    assert class_average(RECORDS) == pytest.approx(232.0)
+
+def test_class_average_of_empty_list_returns_none():
+    assert class_average([]) is None
