@@ -16,3 +16,10 @@ def above_average(records: list[dict]) -> list[dict]:
     if average is None:
         return []
     return [r for r in records if r["total"] > average]
+
+
+def ranking(records: list[dict]) -> list[tuple[int, dict]]:
+    """Return (position, record) pairs, higest total first."""
+    sorted_r = sorted(records, key=lambda r: r["total"], reverse=True)
+    enum_r = list(enumerate(sorted_r, start=1))
+    return enum_r

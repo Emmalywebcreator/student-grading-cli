@@ -1,6 +1,6 @@
 import pytest
 
-from analytics import above_average, class_average, top_scorer
+from analytics import above_average, class_average, ranking, top_scorer
 
 RECORDS = [
     {"name": "Talia", "total": 266},
@@ -62,3 +62,32 @@ def test_exact_average_is_not_above_average():
         {"name": "C", "total": 150},
     ]
     assert above_average(records) == [{"name": "B", "total": 200}]
+
+
+def test_ranking_orders_by_total_highest_first():
+    assert ranking(RECORDS) == [
+        (1, {"name": "Talia", "total": 266}),
+        (2, {"name": "Mathew", "total": 250}),
+        (3, {"name": "John", "total": 180}),
+    ]
+
+
+def test_ranking_does_not_change_the_input():
+    original = [dict(r) for r in RECORDS]
+    ranking(RECORDS)
+    assert RECORDS == original
+
+
+def test_ranking_tie_keeps_listed_order():
+    records = [
+        {"name": "John", "total": 200},
+        {"name": "Talia", "total": 200},
+    ]
+    assert ranking(records) == [
+        (1, {"name": "John", "total": 200}),
+        (2, {"name": "Talia", "total": 200}),
+    ]
+
+
+def test_ranking_of_empty_list():
+    assert ranking([]) == []
