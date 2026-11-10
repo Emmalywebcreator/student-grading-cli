@@ -19,7 +19,7 @@ def above_average(records: list[dict]) -> list[dict]:
 
 
 def ranking(records: list[dict]) -> list[tuple[int, dict]]:
-    """Return (position, record) pairs, higest total first."""
-    sorted_r = sorted(records, key=lambda r: r["total"], reverse=True)
-    enum_r = list(enumerate(sorted_r, start=1))
-    return enum_r
+    """Return (position, record) pairs, highest total first."""
+    return list(
+        enumerate(sorted(records, key=lambda r: r["total"], reverse=True), start=1)
+    )
