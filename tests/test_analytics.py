@@ -95,7 +95,7 @@ def test_ranking_of_empty_list():
     assert ranking([]) == []
 
 
-def test_high_scores_yields_records_at_or_above_minimum(records):
+def test_high_scorers_yields_records_at_or_above_minimum(records):
     assert list(high_scorers(records, 200)) == [
         {"name": "Talia", "total": 266},
         {"name": "Mathew", "total": 250},
@@ -118,12 +118,12 @@ def test_high_scorers_is_lazy(records):
 
     def source():
         for record in records:
-            consumed.append(records["name"])
+            consumed.append(record["name"])
             yield record
 
-        gen = high_scorers(source(), 200)
-        next(gen)
-        assert consumed == ["Talia"]
+    gen = high_scorers(source(), 200)
+    next(gen)
+    assert consumed == ["Talia"]
 
 
 def test_high_scorers_can_only_be_consumed_once(records):
