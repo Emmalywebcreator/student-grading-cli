@@ -1,6 +1,6 @@
 import pytest
 
-from analytics import above_average, class_average, ranking, top_scorer
+from analytics import above_average, class_average, high_scorers, ranking, top_scorer
 
 
 @pytest.fixture
@@ -93,3 +93,40 @@ def test_ranking_tie_keeps_listed_order():
 
 def test_ranking_of_empty_list():
     assert ranking([]) == []
+
+
+def test_high_scores_yields_records_at_or_above_minimum(records):
+    assert list(high_scorers(records, 200)) == [
+        {"name": "Talia", "total": 266},
+        {"name": "Mathew", "total": 250},
+    ]
+
+
+def test_high_scorers_includes_the_exact_minimum(records):
+    assert list(high_scorers(records, 250)) == [
+        {"name": "Talia", "total": 266},
+        {"name": "Mathew", "total": 250},
+    ]
+
+
+def test_high_scorers_when_nobody_qualifies(records):
+    assert list(high_scorers(records, 1000)) == []
+
+
+def test_high_scorers_is_lazy(records):
+    consumed = []
+
+    def source():
+        for record in records:
+            consumed.append(records["name"])
+            yield record
+
+        gen = high_scorers(source(), 200)
+        next(gen)
+        assert consumed == ["Talia"]
+
+
+def test_high_scorers_can_only_be_consumed_once(records):
+    gen = high_scorers(records, 200)
+    assert len(list(gen)) == 2
+    assert list(gen) == []

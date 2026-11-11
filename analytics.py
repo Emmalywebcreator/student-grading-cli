@@ -1,3 +1,6 @@
+from collections.abc import Iterable, Iterator
+
+
 def top_scorer(records: list[dict]) -> dict | None:
     """Return the record with the highest total"""
     return max(records, key=lambda r: r["total"], default=None)
@@ -23,3 +26,10 @@ def ranking(records: list[dict]) -> list[tuple[int, dict]]:
     return list(
         enumerate(sorted(records, key=lambda r: r["total"], reverse=True), start=1)
     )
+
+
+def high_scorers(records: Iterable[dict], minimum: int) -> Iterator[dict]:
+    """Yield each record whose total is at least the minimum"""
+    for r in records:
+        if r["total"] >= minimum:
+            yield r
