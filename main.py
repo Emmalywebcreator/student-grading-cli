@@ -35,12 +35,14 @@ def main():
     eng_score = get_score("English")
     csc_score = get_score("Computer Science")
 
-
-    student = Student(student_name, {
-    "Mathematics": maths_score,
-    "English": eng_score,
-    "Computer Science": csc_score
-})
+    student = Student(
+        student_name,
+        {
+            "Mathematics": maths_score,
+            "English": eng_score,
+            "Computer Science": csc_score,
+        },
+    )
 
     if student.has_passed():
         overall_res = "Congratulations! You passed successfully."
