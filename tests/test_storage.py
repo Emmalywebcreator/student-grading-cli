@@ -3,7 +3,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from storage import CorruptResultsError, load_results, save_result
+from grading.storage import CorruptResultsError, load_results, save_result
 
 
 class TestLoadResults(unittest.TestCase):

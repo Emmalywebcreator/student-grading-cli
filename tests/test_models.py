@@ -1,6 +1,6 @@
 import pytest
 
-from models import Student
+from grading.models import Student
 
 
 @pytest.fixture
