@@ -33,7 +33,7 @@ only the Python standard library.
 ## Run the application
 
 ```bash
-python3 main.py
+python3 -m grading.main
 ```
 
 ## Run the tests and checks
@@ -46,10 +46,10 @@ ruff format --check .
 
 ## Project layout
 
-- `main.py`: the command-line program.
-- `models.py`: the `Student` class (total, average, pass/fail).
-- `storage.py`: saving and loading results in `results.json`.
-- `analytics.py`: functions that work on a list of saved results (top scorer,
+- `grading/main.py`: the command-line program.
+- `grading/models.py`: the `Student` class (total, average, pass/fail).
+- `grading/storage.py`: saving and loading results in `results.json`.
+- `grading/analytics.py`: functions that work on a list of saved results (top scorer,
   class average, ranking). Not used by the command-line program yet.
-- `utils.py`: the `@timed` decorator.
+- `grading/utils.py`: the `@timed` decorator.
 - `tests/`: the test suite.

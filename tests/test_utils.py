@@ -1,6 +1,6 @@
 import pytest
 
-from utils import timed
+from grading.utils import timed
 
 
 def test_timed_returns_the_original_result():

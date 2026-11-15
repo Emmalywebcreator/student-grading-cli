@@ -4,7 +4,7 @@ import unittest
 from io import StringIO
 from unittest.mock import patch
 
-from main import get_name, get_score, main
+from grading.main import get_name, get_score, main
 
 
 class TestGetName(unittest.TestCase):

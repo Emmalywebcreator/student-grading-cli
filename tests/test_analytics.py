@@ -1,6 +1,12 @@
 import pytest
 
-from analytics import above_average, class_average, high_scorers, ranking, top_scorer
+from grading.analytics import (
+    above_average,
+    class_average,
+    high_scorers,
+    ranking,
+    top_scorer,
+)
 
 
 @pytest.fixture

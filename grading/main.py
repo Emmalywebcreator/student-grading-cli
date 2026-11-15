@@ -5,8 +5,8 @@ A Python program that does takes a student name, collect his/her scores in three
 English, and Computer Science. Calculate their scores and tell them if they pass or fail.
 """
 
-from models import Student
-from storage import save_result
+from grading.models import Student
+from grading.storage import save_result
 
 
 def get_score(subject_name: str) -> int:

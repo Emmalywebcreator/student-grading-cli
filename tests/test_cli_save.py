@@ -1,4 +1,4 @@
-import main
+from grading import main
 
 
 def test_main_saves_the_result(monkeypatch):
